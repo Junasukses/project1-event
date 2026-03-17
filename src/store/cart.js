@@ -1,41 +1,34 @@
-import { reactive, computed } from 'vue'
+import { reactive } from 'vue'
 
-export const cartStore = reactive({
-  items: [], // { event, quantity }
-
-  addItem(event) {
-    const existing = this.items.find((i) => i.event.id === event.id)
-    if (existing) {
-      existing.quantity++
-    } else {
-      this.items.push({ event, quantity: 1 })
-    }
+export const appStore = reactive({
+  // Single product — no packages
+  product: {
+    id: 'snapdesk-license',
+    name: 'SnapDesk License',
+    tagline: 'Lisensi Permanent — Sekali Bayar',
+    price: 499000,
   },
 
-  removeItem(eventId) {
-    this.items = this.items.filter((i) => i.event.id !== eventId)
+  // Payment form
+  payment: {
+    name: '',
+    email: '',
+    phone: '',
+    method: 'transfer',
   },
 
-  updateQuantity(eventId, qty) {
-    const item = this.items.find((i) => i.event.id === eventId)
-    if (item) {
-      if (qty <= 0) {
-        this.removeItem(eventId)
-      } else {
-        item.quantity = qty
-      }
-    }
+  // Order state
+  orderConfirmed: false,
+  orderId: null,
+
+  confirmOrder() {
+    this.orderConfirmed = true
+    this.orderId = 'SDK-' + Date.now().toString(36).toUpperCase()
   },
 
-  clearCart() {
-    this.items = []
-  },
-
-  get totalItems() {
-    return this.items.reduce((sum, i) => sum + i.quantity, 0)
-  },
-
-  get totalPrice() {
-    return this.items.reduce((sum, i) => sum + i.event.price * i.quantity, 0)
+  resetOrder() {
+    this.payment = { name: '', email: '', phone: '', method: 'transfer' }
+    this.orderConfirmed = false
+    this.orderId = null
   },
 })

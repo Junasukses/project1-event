@@ -10,18 +10,8 @@ const router = createRouter({
       component: LandingView,
     },
     {
-      path: '/events',
-      name: 'events',
-      component: () => import('../views/EventsView.vue'),
-    },
-    {
-      path: '/cart',
-      name: 'cart',
-      component: () => import('../views/CartView.vue'),
-    },
-    {
-      path: '/checkout',
-      name: 'checkout',
+      path: '/payment',
+      name: 'payment',
       component: () => import('../views/CheckoutView.vue'),
     },
     {
@@ -30,6 +20,9 @@ const router = createRouter({
       component: () => import('../views/SuccessView.vue'),
     },
   ],
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
 export default router

@@ -1,7 +1,6 @@
 <script setup>
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { computed } from 'vue'
-import { cartStore } from './store/cart.js'
 
 const route = useRoute()
 const isLanding = computed(() => route.name === 'landing')
@@ -18,28 +17,22 @@ const isLanding = computed(() => route.name === 'landing')
     <div class="max-w-[1100px] mx-auto px-6 h-16 flex items-center justify-between">
       <RouterLink
         to="/"
-        class="text-xl font-extrabold text-indigo-500 hover:text-indigo-400 tracking-tight no-underline"
+        class="text-xl font-extrabold text-emerald-500 hover:text-emerald-400 tracking-tight no-underline"
       >
-        🎟️ TicketIn
+        🖥️ SnapDesk
       </RouterLink>
       <div class="flex items-center gap-6">
-        <RouterLink
-          to="/events"
-          class="text-slate-400 hover:text-white no-underline text-sm font-semibold transition-colors duration-200 [&.router-link-active]:text-white"
+        <a
+          href="/#features"
+          class="text-slate-400 hover:text-white no-underline text-sm font-semibold transition-colors duration-200"
         >
-          Event
-        </RouterLink>
+          Fitur
+        </a>
         <RouterLink
-          to="/cart"
-          class="relative text-slate-400 hover:text-white no-underline text-xl leading-none transition-colors duration-200"
+          to="/payment"
+          class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold px-5 py-2 rounded-lg text-sm shadow-lg shadow-emerald-500/20 hover:-translate-y-0.5 transition-all duration-200 no-underline"
         >
-          🛒
-          <span
-            v-if="cartStore.totalItems > 0"
-            class="animate-pop absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-[10px] font-black flex items-center justify-center"
-          >
-            {{ cartStore.totalItems }}
-          </span>
+          Beli Sekarang
         </RouterLink>
       </div>
     </div>
