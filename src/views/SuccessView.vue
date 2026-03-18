@@ -61,9 +61,9 @@ async function downloadLicenseFile() {
     const licensePayload = {
       user_id: orderId.value || '',
       email: buyerEmail.value || '',
+      license_key: licenseKey.value,
       hardware_id: hardwareId,
       max_client: buyerClientCount.value || 1,
-      license_key: licenseKey.value,
       product: product.name,
       type: 'permanent',
       issued_at: new Date().toISOString(),
