@@ -33,7 +33,8 @@ function validate() {
   if (!appStore.payment.cpuId.trim()) e.cpuId = 'CPU ID wajib diisi'
   if (!appStore.payment.macAddress.trim()) e.macAddress = 'MAC Address wajib diisi'
   if (!appStore.payment.diskSerial.trim()) e.diskSerial = 'Disk Serial wajib diisi'
-  if (!appStore.payment.clientCount || appStore.payment.clientCount < 1) e.clientCount = 'Jumlah client minimal 1'
+  if (!appStore.payment.clientCount || appStore.payment.clientCount < 1)
+    e.clientCount = 'Jumlah client minimal 1'
   errors.value = e
   return Object.keys(e).length === 0
 }
@@ -225,7 +226,9 @@ const stepsMeta = [
             <div class="flex items-center gap-2 mb-5">
               <span class="text-base">🖥️</span>
               <h3 class="text-sm font-bold text-slate-300">Informasi Perangkat</h3>
-              <span class="text-[10px] text-slate-600 bg-white/[.04] px-2 py-0.5 rounded-full">Untuk lisensi</span>
+              <span class="text-[10px] text-slate-600 bg-white/[.04] px-2 py-0.5 rounded-full"
+                >Untuk lisensi</span
+              >
             </div>
 
             <div class="grid sm:grid-cols-2 gap-5">
@@ -263,7 +266,10 @@ const stepsMeta = [
                       : 'border-white/[.06] focus:border-emerald-500 focus:shadow-[0_0_24px_rgba(16,185,129,.08)]'
                   "
                 />
-                <p v-if="errors.macAddress" class="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                <p
+                  v-if="errors.macAddress"
+                  class="text-red-400 text-xs mt-1.5 flex items-center gap-1"
+                >
                   <span>⚠️</span> {{ errors.macAddress }}
                 </p>
               </div>
@@ -282,7 +288,10 @@ const stepsMeta = [
                       : 'border-white/[.06] focus:border-emerald-500 focus:shadow-[0_0_24px_rgba(16,185,129,.08)]'
                   "
                 />
-                <p v-if="errors.diskSerial" class="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                <p
+                  v-if="errors.diskSerial"
+                  class="text-red-400 text-xs mt-1.5 flex items-center gap-1"
+                >
                   <span>⚠️</span> {{ errors.diskSerial }}
                 </p>
               </div>
@@ -302,18 +311,33 @@ const stepsMeta = [
                       : 'border-white/[.06] focus:border-emerald-500 focus:shadow-[0_0_24px_rgba(16,185,129,.08)]'
                   "
                 />
-                <p v-if="errors.clientCount" class="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                <p
+                  v-if="errors.clientCount"
+                  class="text-red-400 text-xs mt-1.5 flex items-center gap-1"
+                >
                   <span>⚠️</span> {{ errors.clientCount }}
                 </p>
               </div>
             </div>
 
-            <div class="flex gap-2 mt-4 bg-amber-500/[.05] border border-amber-500/10 rounded-xl p-3">
+            <div
+              class="flex gap-2 mt-4 bg-amber-500/[.05] border border-amber-500/10 rounded-xl p-3"
+            >
               <span class="text-sm mt-0.5 shrink-0">💡</span>
               <p class="text-[11px] text-slate-500 leading-relaxed">
-                Buka <strong class="text-amber-400">CMD</strong> dan ketik: <code class="bg-white/[.06] px-1.5 py-0.5 rounded text-amber-300 text-[10px]">wmic cpu get ProcessorId</code> untuk CPU ID,
-                <code class="bg-white/[.06] px-1.5 py-0.5 rounded text-amber-300 text-[10px]">getmac</code> untuk MAC Address,
-                <code class="bg-white/[.06] px-1.5 py-0.5 rounded text-amber-300 text-[10px]">wmic diskdrive get SerialNumber</code> untuk Disk Serial.
+                Buka <strong class="text-amber-400">CMD</strong> dan ketik:
+                <code class="bg-white/[.06] px-1.5 py-0.5 rounded text-amber-300 text-[10px]"
+                  >wmic cpu get ProcessorId</code
+                >
+                untuk CPU ID,
+                <code class="bg-white/[.06] px-1.5 py-0.5 rounded text-amber-300 text-[10px]"
+                  >getmac</code
+                >
+                untuk MAC Address,
+                <code class="bg-white/[.06] px-1.5 py-0.5 rounded text-amber-300 text-[10px]"
+                  >wmic diskdrive get SerialNumber</code
+                >
+                untuk Disk Serial.
               </p>
             </div>
           </div>

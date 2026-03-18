@@ -31,7 +31,16 @@ export const appStore = reactive({
   },
 
   resetOrder() {
-    this.payment = { name: '', email: '', phone: '', cpuId: '', macAddress: '', diskSerial: '', clientCount: 1, method: 'transfer' }
+    this.payment = {
+      name: '',
+      email: '',
+      phone: '',
+      cpuId: '',
+      macAddress: '',
+      diskSerial: '',
+      clientCount: 1,
+      method: 'transfer',
+    }
     this.orderConfirmed = false
     this.orderId = null
   },

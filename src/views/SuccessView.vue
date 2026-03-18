@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { appStore } from '@/store/cart'
+import { generateHardwareId, encryptLicense } from '@/utils/license-crypto'
 
 const router = useRouter()
 
@@ -44,43 +45,49 @@ function copyKey() {
   setTimeout(() => (copied.value = false), 2000)
 }
 
-// Generate and download .lic license file
-function downloadLicenseFile() {
-  const licContent = [
-    '# SnapDesk License File',
-    '# Generated: ' + new Date().toISOString(),
-    '# DO NOT MODIFY THIS FILE',
-    '',
-    '[License]',
-    'OrderID=' + (orderId.value || ''),
-    'LicenseKey=' + licenseKey.value,
-    'Product=' + product.name,
-    'Type=Permanent',
-    '',
-    '[Owner]',
-    'Name=' + (buyerName.value || ''),
-    'Email=' + (buyerEmail.value || ''),
-    '',
-    '[Hardware]',
-    'CPUID=' + (buyerCpuId.value || ''),
-    'MACAddress=' + (buyerMacAddress.value || ''),
-    'DiskSerial=' + (buyerDiskSerial.value || ''),
-    'ClientCount=' + (buyerClientCount.value || 1),
-    '',
-    '[Signature]',
-    'Hash=' + btoa(licenseKey.value + (buyerCpuId.value || '') + (buyerMacAddress.value || '') + (buyerDiskSerial.value || '')),
-    '',
-  ].join('\n')
+// Generate and download encrypted .lic license file
+const isGeneratingLic = ref(false)
+async function downloadLicenseFile() {
+  isGeneratingLic.value = true
+  try {
+    // 1. Generate hardware_id hash from hardware components
+    const hardwareId = await generateHardwareId(
+      buyerCpuId.value || '',
+      buyerMacAddress.value || '',
+      buyerDiskSerial.value || '',
+    )
 
-  const blob = new Blob([licContent], { type: 'application/octet-stream' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'SnapDesk-' + (orderId.value || 'license') + '.lic'
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+    // 2. Build license payload (matches API response format)
+    const licensePayload = {
+      user_id: orderId.value || '',
+      email: buyerEmail.value || '',
+      hardware_id: hardwareId,
+      max_client: buyerClientCount.value || 1,
+      license_key: licenseKey.value,
+      product: product.name,
+      type: 'permanent',
+      issued_at: new Date().toISOString(),
+    }
+
+    // 3. Encrypt the payload
+    const encryptedBuffer = await encryptLicense(licensePayload)
+
+    // 4. Download as .lic file
+    const blob = new Blob([encryptedBuffer], { type: 'application/octet-stream' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'SnapDesk-' + (orderId.value || 'license') + '.lic'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (err) {
+    console.error('Failed to generate license file:', err)
+    alert('Gagal membuat file lisensi. Silakan coba lagi.')
+  } finally {
+    isGeneratingLic.value = false
+  }
 }
 
 // Download desktop app (placeholder link)
@@ -325,7 +332,8 @@ function backToHome() {
             </button>
             <button
               @click="downloadLicenseFile"
-              class="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 hover:scale-[1.02] cursor-pointer shadow-lg shadow-cyan-600/20"
+              :disabled="isGeneratingLic"
+              class="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 hover:scale-[1.02] cursor-pointer shadow-lg shadow-cyan-600/20 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <svg
                 class="w-5 h-5"
