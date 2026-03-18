@@ -12,6 +12,10 @@ if (!appStore.orderConfirmed) {
 const orderId = computed(() => appStore.orderId)
 const buyerName = computed(() => appStore.payment.name)
 const buyerEmail = computed(() => appStore.payment.email)
+const buyerCpuId = computed(() => appStore.payment.cpuId)
+const buyerMacAddress = computed(() => appStore.payment.macAddress)
+const buyerDiskSerial = computed(() => appStore.payment.diskSerial)
+const buyerClientCount = computed(() => appStore.payment.clientCount)
 
 const product = appStore.product
 const serviceFee = computed(() => Math.round(product.price * 0.03))
@@ -38,6 +42,52 @@ function copyKey() {
   navigator.clipboard.writeText(licenseKey.value)
   copied.value = true
   setTimeout(() => (copied.value = false), 2000)
+}
+
+// Generate and download .lic license file
+function downloadLicenseFile() {
+  const licContent = [
+    '# SnapDesk License File',
+    '# Generated: ' + new Date().toISOString(),
+    '# DO NOT MODIFY THIS FILE',
+    '',
+    '[License]',
+    'OrderID=' + (orderId.value || ''),
+    'LicenseKey=' + licenseKey.value,
+    'Product=' + product.name,
+    'Type=Permanent',
+    '',
+    '[Owner]',
+    'Name=' + (buyerName.value || ''),
+    'Email=' + (buyerEmail.value || ''),
+    '',
+    '[Hardware]',
+    'CPUID=' + (buyerCpuId.value || ''),
+    'MACAddress=' + (buyerMacAddress.value || ''),
+    'DiskSerial=' + (buyerDiskSerial.value || ''),
+    'ClientCount=' + (buyerClientCount.value || 1),
+    '',
+    '[Signature]',
+    'Hash=' + btoa(licenseKey.value + (buyerCpuId.value || '') + (buyerMacAddress.value || '') + (buyerDiskSerial.value || '')),
+    '',
+  ].join('\n')
+
+  const blob = new Blob([licContent], { type: 'application/octet-stream' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'SnapDesk-' + (orderId.value || 'license') + '.lic'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+// Download desktop app (placeholder link)
+function downloadDesktopApp() {
+  // Replace with actual download URL
+  const downloadUrl = 'https://releases.snapdesk.id/latest/SnapDesk-Setup.exe'
+  window.open(downloadUrl, '_blank')
 }
 
 // Floating particles
@@ -200,6 +250,31 @@ function backToHome() {
               <p class="text-gray-500 text-xs mb-0.5">Email</p>
               <p class="text-white text-sm font-medium">{{ buyerEmail }}</p>
             </div>
+            <!-- Hardware Info -->
+            <div class="relative">
+              <div
+                class="absolute -left-[29px] top-1 w-3 h-3 rounded-full bg-cyan-500 ring-4 ring-[#10101c]"
+              />
+              <p class="text-gray-500 text-xs mb-0.5">Informasi Perangkat</p>
+              <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-1">
+                <div>
+                  <span class="text-gray-500 text-[10px]">CPU ID</span>
+                  <p class="text-white text-xs font-mono">{{ buyerCpuId }}</p>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px]">MAC Address</span>
+                  <p class="text-white text-xs font-mono">{{ buyerMacAddress }}</p>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px]">Disk Serial</span>
+                  <p class="text-white text-xs font-mono">{{ buyerDiskSerial }}</p>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px]">Jumlah Client</span>
+                  <p class="text-white text-xs font-medium">{{ buyerClientCount }} perangkat</p>
+                </div>
+              </div>
+            </div>
             <!-- Product -->
             <div class="relative">
               <div
@@ -227,28 +302,50 @@ function backToHome() {
         </p>
 
         <!-- Action buttons -->
-        <div class="flex flex-col sm:flex-row gap-3 mb-8">
-          <button
-            class="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 hover:scale-[1.02] cursor-pointer shadow-lg shadow-emerald-600/20"
-          >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
+        <div class="flex flex-col gap-3 mb-8">
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button
+              @click="downloadDesktopApp"
+              class="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 hover:scale-[1.02] cursor-pointer shadow-lg shadow-emerald-600/20"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-              />
-            </svg>
-            Download SnapDesk
-          </button>
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              Download SnapDesk (.exe)
+            </button>
+            <button
+              @click="downloadLicenseFile"
+              class="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 hover:scale-[1.02] cursor-pointer shadow-lg shadow-cyan-600/20"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              Download Lisensi (.lic)
+            </button>
+          </div>
           <button
             @click="backToHome"
-            class="flex-1 inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-gray-300 px-6 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 border border-white/10 cursor-pointer"
+            class="w-full inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-gray-300 px-6 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 border border-white/10 cursor-pointer"
           >
             Kembali ke Beranda
           </button>

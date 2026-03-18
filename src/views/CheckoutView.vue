@@ -30,6 +30,10 @@ function validate() {
     e.email = 'Format email tidak valid'
   if (!appStore.payment.phone.trim()) e.phone = 'Nomor HP wajib diisi'
   else if (!/^[0-9+\-\s]{8,15}$/.test(appStore.payment.phone)) e.phone = 'Nomor HP tidak valid'
+  if (!appStore.payment.cpuId.trim()) e.cpuId = 'CPU ID wajib diisi'
+  if (!appStore.payment.macAddress.trim()) e.macAddress = 'MAC Address wajib diisi'
+  if (!appStore.payment.diskSerial.trim()) e.diskSerial = 'Disk Serial wajib diisi'
+  if (!appStore.payment.clientCount || appStore.payment.clientCount < 1) e.clientCount = 'Jumlah client minimal 1'
   errors.value = e
   return Object.keys(e).length === 0
 }
@@ -216,6 +220,104 @@ const stepsMeta = [
             </div>
           </div>
 
+          <!-- Hardware Info Section -->
+          <div class="mt-7 pt-7 border-t border-white/[.06]">
+            <div class="flex items-center gap-2 mb-5">
+              <span class="text-base">🖥️</span>
+              <h3 class="text-sm font-bold text-slate-300">Informasi Perangkat</h3>
+              <span class="text-[10px] text-slate-600 bg-white/[.04] px-2 py-0.5 rounded-full">Untuk lisensi</span>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-5">
+              <div>
+                <label class="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> CPU ID
+                </label>
+                <input
+                  v-model="appStore.payment.cpuId"
+                  type="text"
+                  placeholder="Contoh: BFEBFBFF000906A3"
+                  class="w-full bg-white/[.03] border-2 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-600 outline-none transition-all duration-200 font-mono text-sm"
+                  :class="
+                    errors.cpuId
+                      ? 'border-red-500/50'
+                      : 'border-white/[.06] focus:border-emerald-500 focus:shadow-[0_0_24px_rgba(16,185,129,.08)]'
+                  "
+                />
+                <p v-if="errors.cpuId" class="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {{ errors.cpuId }}
+                </p>
+              </div>
+              <div>
+                <label class="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> MAC Address
+                </label>
+                <input
+                  v-model="appStore.payment.macAddress"
+                  type="text"
+                  placeholder="Contoh: 00:1A:2B:3C:4D:5E"
+                  class="w-full bg-white/[.03] border-2 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-600 outline-none transition-all duration-200 font-mono text-sm"
+                  :class="
+                    errors.macAddress
+                      ? 'border-red-500/50'
+                      : 'border-white/[.06] focus:border-emerald-500 focus:shadow-[0_0_24px_rgba(16,185,129,.08)]'
+                  "
+                />
+                <p v-if="errors.macAddress" class="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {{ errors.macAddress }}
+                </p>
+              </div>
+              <div>
+                <label class="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Disk Serial
+                </label>
+                <input
+                  v-model="appStore.payment.diskSerial"
+                  type="text"
+                  placeholder="Contoh: WD-WMC4N0123456"
+                  class="w-full bg-white/[.03] border-2 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-600 outline-none transition-all duration-200 font-mono text-sm"
+                  :class="
+                    errors.diskSerial
+                      ? 'border-red-500/50'
+                      : 'border-white/[.06] focus:border-emerald-500 focus:shadow-[0_0_24px_rgba(16,185,129,.08)]'
+                  "
+                />
+                <p v-if="errors.diskSerial" class="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {{ errors.diskSerial }}
+                </p>
+              </div>
+              <div>
+                <label class="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Jumlah Client
+                </label>
+                <input
+                  v-model.number="appStore.payment.clientCount"
+                  type="number"
+                  min="1"
+                  placeholder="1"
+                  class="w-full bg-white/[.03] border-2 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-600 outline-none transition-all duration-200"
+                  :class="
+                    errors.clientCount
+                      ? 'border-red-500/50'
+                      : 'border-white/[.06] focus:border-emerald-500 focus:shadow-[0_0_24px_rgba(16,185,129,.08)]'
+                  "
+                />
+                <p v-if="errors.clientCount" class="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {{ errors.clientCount }}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex gap-2 mt-4 bg-amber-500/[.05] border border-amber-500/10 rounded-xl p-3">
+              <span class="text-sm mt-0.5 shrink-0">💡</span>
+              <p class="text-[11px] text-slate-500 leading-relaxed">
+                Buka <strong class="text-amber-400">CMD</strong> dan ketik: <code class="bg-white/[.06] px-1.5 py-0.5 rounded text-amber-300 text-[10px]">wmic cpu get ProcessorId</code> untuk CPU ID,
+                <code class="bg-white/[.06] px-1.5 py-0.5 rounded text-amber-300 text-[10px]">getmac</code> untuk MAC Address,
+                <code class="bg-white/[.06] px-1.5 py-0.5 rounded text-amber-300 text-[10px]">wmic diskdrive get SerialNumber</code> untuk Disk Serial.
+              </p>
+            </div>
+          </div>
+
           <button
             @click="goStep(2)"
             class="w-full mt-9 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-500/20 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
@@ -332,6 +434,10 @@ const stepsMeta = [
                   { ico: '👤', lbl: 'Nama', val: appStore.payment.name },
                   { ico: '📧', lbl: 'Email', val: appStore.payment.email },
                   { ico: '📞', lbl: 'Telepon', val: appStore.payment.phone },
+                  { ico: '🖥️', lbl: 'CPU ID', val: appStore.payment.cpuId },
+                  { ico: '🌐', lbl: 'MAC Addr', val: appStore.payment.macAddress },
+                  { ico: '💾', lbl: 'Disk SN', val: appStore.payment.diskSerial },
+                  { ico: '👥', lbl: 'Client', val: appStore.payment.clientCount + ' perangkat' },
                   {
                     ico: '💳',
                     lbl: 'Bayar via',
