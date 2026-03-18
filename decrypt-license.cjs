@@ -85,7 +85,9 @@ function main() {
     console.log('')
     console.log('Examples:')
     console.log('  node decrypt-license.js SnapDesk-SDK-M1ABC123.lic')
-    console.log('  node decrypt-license.js license.lic --verify BFEBFBFF000906A3 00:1A:2B:3C:4D:5E WD-WMC4N0123456')
+    console.log(
+      '  node decrypt-license.js license.lic --verify BFEBFBFF000906A3 00:1A:2B:3C:4D:5E WD-WMC4N0123456',
+    )
     console.log('')
     process.exit(0)
   }
@@ -111,21 +113,8 @@ function main() {
   try {
     const data = decryptLicense(buffer)
 
-    console.log('✅ Decryption successful!')
-    console.log('')
-    console.log('┌─────────────────────────────────────────────────┐')
-    console.log('│              LICENSE INFORMATION                 │')
-    console.log('├─────────────────────────────────────────────────┤')
-    console.log(`│ User ID      : ${data.user_id || '-'}`)
-    console.log(`│ Email        : ${data.email || '-'}`)
-    console.log(`│ License Key  : ${data.license_key || '-'}`)
-    console.log(`│ Hardware ID  : ${data.hardware_id || '-'}`)
-    console.log(`│ Max Client   : ${data.max_client || '-'}`)
-    console.log(`│ Product      : ${data.product || '-'}`)
-    console.log(`│ Type         : ${data.type || '-'}`)
-    console.log(`│ Issued At    : ${data.issued_at || '-'}`)
-    console.log('└─────────────────────────────────────────────────┘')
-    console.log('')
+    // Output pure JSON so server/tools can parse it directly
+    console.log(JSON.stringify(data, null, 2))
 
     // --verify flag
     const verifyIdx = args.indexOf('--verify')
@@ -134,34 +123,21 @@ function main() {
       const macAddress = args[verifyIdx + 2]
       const diskSerial = args[verifyIdx + 3]
 
-      console.log('🔍 Hardware Verification:')
-      console.log(`   CPU ID       : ${cpuId}`)
-      console.log(`   MAC Address  : ${macAddress}`)
-      console.log(`   Disk Serial  : ${diskSerial}`)
-
       const computedHash = generateHardwareId(cpuId, macAddress, diskSerial)
-      console.log(`   Computed Hash: ${computedHash}`)
-      console.log(`   License Hash : ${data.hardware_id}`)
-
-      if (computedHash === data.hardware_id) {
-        console.log('')
-        console.log('   ✅ MATCH — Hardware is authorized for this license.')
-      } else {
-        console.log('')
-        console.log('   ❌ MISMATCH — Hardware does NOT match this license!')
+      const verification = {
+        verify: {
+          cpu_id: cpuId,
+          mac_address: macAddress,
+          disk_serial: diskSerial,
+          computed_hash: computedHash,
+          license_hash: data.hardware_id,
+          match: computedHash === data.hardware_id,
+        },
       }
-      console.log('')
+      console.log(JSON.stringify(verification, null, 2))
     }
-
-    // Output raw JSON
-    console.log('📋 Raw JSON:')
-    console.log(JSON.stringify(data, null, 2))
-    console.log('')
   } catch (err) {
-    console.error('❌ Decryption failed!')
-    console.error('   The file may be corrupted or was encrypted with a different key.')
-    console.error(`   Error: ${err.message}`)
-    console.log('')
+    console.error(JSON.stringify({ error: 'Decryption failed', message: err.message }))
     process.exit(1)
   }
 }

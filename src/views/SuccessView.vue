@@ -63,6 +63,11 @@ async function downloadLicenseFile() {
       email: buyerEmail.value || '',
       license_key: licenseKey.value,
       hardware_id: hardwareId,
+      device: {
+        cpu_id: buyerCpuId.value || '',
+        mac_address: buyerMacAddress.value || '',
+        disk_serial: buyerDiskSerial.value || '',
+      },
       max_client: buyerClientCount.value || 1,
       product: product.name,
       type: 'permanent',
